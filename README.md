@@ -1,0 +1,1 @@
+# Python laba 1
