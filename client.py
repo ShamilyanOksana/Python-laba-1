@@ -21,6 +21,7 @@ def print_table(table):
 
 sock = socket.socket()
 sock.connect((socket.gethostname(), 5000))
+table_size = 5
 
 message = input("Are you ready? [y/n]  ")
 send_to_server(message)
@@ -44,7 +45,7 @@ else:
     if message == 'start':
         while True:
             player = move[1]
-            if player[2] == 4 and player[3] == 4:
+            if player[2] == (table_size-1) and player[3] == (table_size-1):
                 print("\n", "YOU WIN!", "\n")
                 break
 

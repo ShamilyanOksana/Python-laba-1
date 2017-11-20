@@ -12,9 +12,9 @@ def prepare_to_game(data, connection):
             send_to_client(answer)
 
             while True:
-                ind_x = random.randint(0, 4)
-                ind_y = random.randint(0, 4)
-                if (ind_x != 0 and ind_y != 0) and (ind_x != 4 and ind_y != 4):
+                ind_x = random.randint(0, table_size-1)
+                ind_y = random.randint(0, table_size-1)
+                if (ind_x != 0 and ind_y != 0) and (ind_x != (table_size-1) and ind_y != (table_size-1)):
                     break
             player = [0, 0, ind_x, ind_y]
             create_and_send_table(player)
@@ -37,12 +37,12 @@ def prepare_to_game(data, connection):
 
 
 def create_and_send_table(player):
-    print('player=',  player)
+
     x = player[0]
     y = player[1]
     ind_x = player[2]
     ind_y = player[3]
-    table = [['.' for i in range(5)]for i in range(5)]
+    table = [['.' for i in range(table_size)]for i in range(table_size)]
     table[x][y] = "X"
     table[ind_x][ind_y] = "■"
     table[-1][-1] = "/\Exit"
@@ -64,7 +64,6 @@ def make_move(connection):
             break
         else:
             move = pickle.loads(move)
-        print(move)
         if move == 'break':
             close_connection(connection)
             break
@@ -98,13 +97,13 @@ def up(player):
     if x != 0:
         x -= 1
     else:
-        if y != 4:
-            x = 4
+        if y != (table_size-1):
+            x = table_size-1
         else:
-            x = 3
+            x = table_size-2
     if x == ind_x and y == ind_y:
         if ind_x == 0:
-            ind_x = 4
+            ind_x = table_size-1
         else:
             ind_x -= 1
     player = [x, y, ind_x, ind_y]
@@ -117,14 +116,14 @@ def down(player):
     ind_x = player[2]
     ind_y = player[3]
 
-    if x == 3 and y == 4:
+    if x == (table_size-2) and y == (table_size-1):
         x = 0
-    elif x != 4:
+    elif x != (table_size-1):
         x += 1
     else:
         x = 0
     if x == ind_x and y == ind_y:
-        if ind_x == 4:
+        if ind_x == (table_size-1):
             ind_x = 0
         else:
             ind_x += 1
@@ -139,14 +138,14 @@ def right(player):
     ind_x = player[2]
     ind_y = player[3]
 
-    if y == 3 and x == 4:
+    if y == (table_size-2) and x == (table_size-1):
         y = 0
-    elif y != 4:
+    elif y != (table_size-1):
         y += 1
     else:
         y = 0
     if x == ind_x and y == ind_y:
-        if ind_y == 4:
+        if ind_y == (table_size-1):
             ind_y = 0
         else:
             ind_y += 1
@@ -164,13 +163,13 @@ def left(player):
     if y != 0:
         y -= 1
     else:
-        if x != 4:
-            y = 4
+        if x != (table_size-1):
+            y = table_size-1
         else:
-            y = 3
+            y = table_size-2
     if x == ind_x and y == ind_y:
         if ind_y == 0:
-            ind_y = 4
+            ind_y = table_size-1
         else:
             ind_y -= 1
 
@@ -193,15 +192,14 @@ def close_connection(connection):
     connection.close()
 
 
-
 sock = socket.socket()
 sock.bind(('', 5000))
 sock.listen(5)
+table_size = 5
 while True:
     conn, address = sock.accept()
     print('connected:', address)
     data = get_from_client()
-    print('first data:', data)
 
     event = threading.Event()
     thread = threading.Thread(target=prepare_to_game, args=(data, conn, ))
